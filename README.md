@@ -1,4 +1,4 @@
-# 🚁 Quadrotor Flight Simulation
+# Quadrotor Flight Simulation
 
 A MATLAB/GNU Octave simulation of a quadrotor drone performing closed-loop trajectory tracking using a cascaded PID controller, nonlinear 6-DOF rigid-body dynamics, and motor mixing.
 
@@ -6,7 +6,7 @@ The simulation commands a **rising helical trajectory**, computes the required t
 
 ---
 
-## 📌 Overview
+##  Overview
 
 This project models the main computational components of a quadrotor flight-control system:
 
@@ -22,7 +22,7 @@ This project models the main computational components of a quadrotor flight-cont
 
 ---
 
-## ⚙️ System Workflow
+## System Workflow
 
 ```mermaid
 flowchart TD
@@ -50,7 +50,7 @@ The simulation follows a closed-loop control process:
 
 ---
 
-## 🧮 Mathematical Model
+## Mathematical Model
 
 The quadrotor is represented using a **12-state rigid-body model**:
 
@@ -74,7 +74,7 @@ The model uses a **ZYX yaw-pitch-roll rotation convention** and includes transla
 
 ---
 
-## 🎮 Control Strategy
+##  Control Strategy
 
 ### Outer Position Loop
 
@@ -110,7 +110,7 @@ Integral windup protection is included in the position controller by limiting th
 
 ---
 
-## 🚁 Motor Mixing
+##  Motor Mixing
 
 The controller output is:
 
@@ -144,7 +144,7 @@ Rotor speeds are constrained to the configured physical limits.
 
 ---
 
-## 🌀 Reference Trajectory
+##  Reference Trajectory
 
 The default trajectory is a **rising helix**:
 
@@ -174,7 +174,7 @@ This makes it straightforward to replace the default helix with another trajecto
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 QuadrotorDroneSim/
@@ -199,7 +199,7 @@ QuadrotorDroneSim/
 
 ---
 
-## 📄 File Descriptions
+##  File Descriptions
 
 | File                  | Purpose                                                  |
 | --------------------- | -------------------------------------------------------- |
@@ -236,7 +236,7 @@ functions/quad_params.m
 
 ---
 
-## 💻 Requirements
+##  Requirements
 
 ### MATLAB
 
@@ -259,7 +259,7 @@ The project files use MATLAB-compatible syntax.
 
 ---
 
-## ▶️ How to Run
+##  How to Run
 
 1. Open MATLAB or GNU Octave.
 2. Set the `QuadrotorDroneSim` folder as the current working directory.
@@ -289,7 +289,7 @@ results/
 
 ---
 
-## 📊 Results
+##  Results
 
 The repository includes representative outputs from the simulation.
 
@@ -325,7 +325,7 @@ The animation visualizes the quadrotor body, rotor locations, and flight trail a
 
 ---
 
-## 📈 Performance Metric
+## Performance Metric
 
 The simulation calculates the position-tracking RMSE using:
 
@@ -383,7 +383,7 @@ Tfinal = 30;
 
 ---
 
-## ⚠️ Limitations
+##  Limitations
 
 This is a computational simulation rather than a complete physical flight model.
 
@@ -403,7 +403,7 @@ The model is therefore intended primarily for studying **quadrotor dynamics, tra
 
 ---
 
-## 🚀 Future Improvements
+##  Future Improvements
 
 Possible extensions include:
 
@@ -418,7 +418,7 @@ Possible extensions include:
 
 ---
 
-## 👩‍💻 Author
+##  Author
 
 **RISHITHA C**
 
