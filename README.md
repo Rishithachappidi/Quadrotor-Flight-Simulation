@@ -1,93 +1,86 @@
-Quadrotor Flight Simulation
+# 🚁 Quadrotor Flight Simulation
 
 A MATLAB/GNU Octave simulation of a quadrotor drone performing closed-loop trajectory tracking using a cascaded PID controller, nonlinear 6-DOF rigid-body dynamics, and motor mixing.
 
-The simulation commands a rising helical trajectory, computes the required thrust and body torques, converts those commands into four rotor speeds, and integrates the quadrotor dynamics over a 30-second flight.
+The simulation commands a **rising helical trajectory**, computes the required thrust and body torques, converts those commands into four rotor speeds, and integrates the quadrotor dynamics over a **30-second flight**.
 
-Overview
+---
+
+## 📌 Overview
 
 This project models the main computational components of a quadrotor flight-control system:
 
-Nonlinear 6-DOF rigid-body dynamics
+* Nonlinear 6-DOF rigid-body dynamics
+* Cascaded position PID and attitude PD control
+* X-configuration motor mixing
+* Reference trajectory generation
+* Position and attitude tracking
+* Rotor-speed logging
+* 3D flight-path visualization
+* Animated quadrotor visualization
+* Position-tracking RMSE calculation
 
-Cascaded position PID and attitude PD control
+---
 
-X-configuration motor mixing
+## ⚙️ System Workflow
 
-Reference trajectory generation
+```mermaid
+flowchart TD
+    A[Reference Trajectory] --> B[Position PID Controller]
+    B --> C[Desired Acceleration]
 
-Position and attitude tracking
+    C --> D[Desired Roll / Pitch]
+    C --> E[Total Thrust]
 
-Rotor-speed logging
+    D --> F[Attitude PD Controller]
+    E --> F
 
-3D flight-path visualization
+    F --> G[Desired Body Torques]
+    G --> H[Motor Mixing]
+    H --> I[Four Rotor Speeds]
+    I --> J[Nonlinear Quadrotor Dynamics]
+    J --> K[Updated 12-State Drone Model]
 
-Animated quadrotor visualization
+    K --> B
+```
 
-Position-tracking RMSE calculation
+The simulation follows a closed-loop control process:
 
-System Workflow
+**Reference Trajectory → Position Control → Desired Acceleration → Attitude Control → Motor Mixing → Rotor Speeds → Quadrotor Dynamics → Feedback**
 
-Reference Trajectory
-        │
-        ▼
- Position PID Controller
-        │
-        ▼
-Desired Acceleration
-        │
-        ├──► Desired Roll / Pitch
-        │
-        └──► Total Thrust
-                 │
-                 ▼
-        Attitude PD Controller
-                 │
-                 ▼
-        Desired Body Torques
-                 │
-                 ▼
-           Motor Mixing
-                 │
-                 ▼
-        Four Rotor Speeds
-                 │
-                 ▼
-     Nonlinear Quadrotor Dynamics
-                 │
-                 ▼
-          Updated 12-State
-             Drone Model
-                 │
-                 └──────────► Feedback to Controller
+---
 
-Mathematical Model
+## 🧮 Mathematical Model
 
-The quadrotor is represented using a 12-state rigid-body model:
+The quadrotor is represented using a **12-state rigid-body model**:
 
+```text
 [x, y, z,
  x_dot, y_dot, z_dot,
  phi, theta, psi,
  p, q, r]
+```
 
 where:
 
-x, y, z are inertial-frame positions
+| Variable              | Description                 |
+| --------------------- | --------------------------- |
+| `x, y, z`             | Inertial-frame positions    |
+| `x_dot, y_dot, z_dot` | Linear velocities           |
+| `phi, theta, psi`     | Roll, pitch, and yaw angles |
+| `p, q, r`             | Body-frame angular rates    |
 
-x_dot, y_dot, z_dot are linear velocities
+The model uses a **ZYX yaw-pitch-roll rotation convention** and includes translational and rotational rigid-body dynamics.
 
-phi, theta, psi are roll, pitch, and yaw angles
+---
 
-p, q, r are body-frame angular rates
+## 🎮 Control Strategy
 
-The model uses a ZYX yaw-pitch-roll rotation convention and includes translational and rotational rigid-body dynamics.
+### Outer Position Loop
 
-Control Strategy
+The outer loop uses **PID control** to calculate the desired acceleration from position and velocity tracking errors.
 
-Outer Position Loop
-
-The outer loop uses PID control to calculate the desired acceleration from position and velocity tracking errors.
-
+```text
 Position Error
       +
 Velocity Error
@@ -95,13 +88,15 @@ Velocity Error
    PID Control
       ↓
 Desired Acceleration
+```
 
 The desired vertical acceleration is converted into total thrust with gravity compensation. Desired horizontal accelerations are mapped to roll and pitch commands.
 
-Inner Attitude Loop
+### Inner Attitude Loop
 
-The inner loop uses PD control to track the desired roll, pitch, and yaw angles and generate the required body torques:
+The inner loop uses **PD control** to track the desired roll, pitch, and yaw angles and generate the required body torques.
 
+```text
 Desired Attitude
       -
 Actual Attitude
@@ -109,59 +104,79 @@ Actual Attitude
     PD Control
       ↓
 Body Torques
+```
 
 Integral windup protection is included in the position controller by limiting the accumulated position error.
 
-Motor Mixing
+---
+
+## 🚁 Motor Mixing
 
 The controller output is:
 
+```text
 [T, tau_phi, tau_theta, tau_psi]
+```
 
 where:
 
-T = total thrust
+| Variable    | Description  |
+| ----------- | ------------ |
+| `T`         | Total thrust |
+| `tau_phi`   | Roll torque  |
+| `tau_theta` | Pitch torque |
+| `tau_psi`   | Yaw torque   |
 
-tau_phi = roll torque
-
-tau_theta = pitch torque
-
-tau_psi = yaw torque
-
-The motor mixer allocates these commands to four individual rotors using an X-configuration mixing matrix.
+The motor mixer allocates these commands to four individual rotors using an **X-configuration mixing matrix**.
 
 Rotor thrust follows:
 
+```text
 f_i = kF * omega_i^2
+```
 
-where kF is the rotor thrust coefficient and omega_i is the rotor angular speed.
+where:
+
+* `kF` = rotor thrust coefficient
+* `omega_i` = rotor angular speed
 
 Rotor speeds are constrained to the configured physical limits.
 
-Reference Trajectory
+---
 
-The default trajectory is a rising helix:
+## 🌀 Reference Trajectory
 
+The default trajectory is a **rising helix**:
+
+```text
 x(t) = R cos(wt)
 y(t) = R sin(wt)
 z(t) = z0 + climb*t
+```
 
-with:
+### Trajectory Parameters
 
-Radius R = 1.5 m
+| Parameter             |     Value |
+| --------------------- | --------: |
+| Radius `R`            |     1.5 m |
+| Angular speed `w`     | 0.5 rad/s |
+| Climb rate            |  0.15 m/s |
+| Initial altitude      |     1.0 m |
+| Final simulation time |      30 s |
 
-Angular speed w = 0.5 rad/s
+The trajectory is generated in:
 
-Climb rate 0.15 m/s
+```text
+functions/get_reference.m
+```
 
-Initial altitude 1.0 m
+This makes it straightforward to replace the default helix with another trajectory.
 
-Final simulation time 30 s
+---
 
-The trajectory is generated in get_reference.m, making it straightforward to replace the helix with another path.
+## 📁 Project Structure
 
-Project Structure
-
+```text
 QuadrotorDroneSim/
 │
 ├── README.md
@@ -180,242 +195,231 @@ QuadrotorDroneSim/
     ├── attitude_motors.png
     ├── flight_path_3d.png
     └── drone_animation.gif
+```
 
-File Descriptions
+---
 
-File
+## 📄 File Descriptions
 
-Purpose
+| File                  | Purpose                                                  |
+| --------------------- | -------------------------------------------------------- |
+| `main_simulation.m`   | Main simulation script, logging, plotting, and animation |
+| `quad_params.m`       | Defines drone physical parameters and controller gains   |
+| `quad_dynamics.m`     | Computes nonlinear 6-DOF rigid-body dynamics             |
+| `quad_controller.m`   | Implements cascaded position PID and attitude PD control |
+| `motor_mixing.m`      | Converts total thrust and torques into four rotor speeds |
+| `get_reference.m`     | Generates the desired rising-helical trajectory          |
+| `animate_quadrotor.m` | Generates the 3D quadrotor animation                     |
+| `results/`            | Contains generated plots and the animation               |
 
-main_simulation.m
+---
 
-Main simulation script, logging, plotting, and animation
-
-quad_params.m
-
-Defines drone physical parameters and controller gains
-
-quad_dynamics.m
-
-Computes nonlinear 6-DOF rigid-body dynamics
-
-quad_controller.m
-
-Implements cascaded position PID and attitude PD control
-
-motor_mixing.m
-
-Converts total thrust and torques into four rotor speeds
-
-get_reference.m
-
-Generates the desired rising-helical trajectory
-
-animate_quadrotor.m
-
-Generates the 3D quadrotor animation
-
-results/
-
-Contains generated plots and the animation
-
-Simulation Configuration
+## ⚙️ Simulation Configuration
 
 The current simulation uses:
 
-Parameter
+| Parameter                |     Value |
+| ------------------------ | --------: |
+| Mass                     |    1.0 kg |
+| Arm length               |   0.225 m |
+| Gravity                  | 9.81 m/s² |
+| Simulation time          |      30 s |
+| Integration/control step |    0.01 s |
+| Maximum rotor speed      | 838 rad/s |
+| Maximum commanded tilt   |       30° |
 
-Value
+The physical parameters and PID/PD gains can be modified in:
 
-Mass
+```text
+functions/quad_params.m
+```
 
-1.0 kg
+---
 
-Arm length
+## 💻 Requirements
 
-0.225 m
+### MATLAB
 
-Gravity
+A recent MATLAB installation with standard numerical and plotting functionality is recommended.
 
-9.81 m/s²
+### GNU Octave
 
-Simulation time
+The project can also be run using GNU Octave.
 
-30 s
+The animation function uses Octave's **image package** for GIF generation.
 
-Integration/control step
+If required:
 
-0.01 s
-
-Maximum rotor speed
-
-838 rad/s
-
-Maximum commanded tilt
-
-30°
-
-The physical parameters and PID/PD gains can be modified in functions/quad_params.m.
-
-Requirements
-
-MATLAB
-
-A recent MATLAB installation with the standard numerical and plotting functionality is recommended.
-
-GNU Octave
-
-The project can also be run using GNU Octave. The animation function uses Octave's image package for GIF generation.
-
-If required, install/load the package using:
-
+```matlab
 pkg install -forge image
 pkg load image
+```
 
 The project files use MATLAB-compatible syntax.
 
-How to Run
+---
 
-Open MATLAB or GNU Octave.
+## ▶️ How to Run
 
-Set the QuadrotorDroneSim folder as the current working directory.
+1. Open MATLAB or GNU Octave.
+2. Set the `QuadrotorDroneSim` folder as the current working directory.
+3. Run:
 
-Run:
-
+```matlab
 main_simulation
+```
 
 The script will:
 
-Load the quadrotor parameters.
+1. Load the quadrotor parameters.
+2. Generate the reference trajectory.
+3. Run the cascaded flight controller.
+4. Perform motor mixing.
+5. Integrate the nonlinear quadrotor dynamics.
+6. Calculate the position-tracking RMSE.
+7. Generate tracking and attitude plots.
+8. Generate the 3D flight-path plot.
+9. Generate the animated GIF.
 
-Generate the reference trajectory.
+Generated results are saved automatically in:
 
-Run the cascaded flight controller.
+```text
+results/
+```
 
-Perform motor mixing.
+---
 
-Integrate the nonlinear quadrotor dynamics.
-
-Calculate the position-tracking RMSE.
-
-Generate tracking and attitude plots.
-
-Generate the 3D flight-path plot.
-
-Generate the animated GIF.
-
-Generated results are saved automatically in the results/ directory.
-
-Results
+## 📊 Results
 
 The repository includes representative outputs from the simulation.
 
-Position Tracking
+### Position Tracking
 
+![Position Tracking](results/position_tracking.png)
 
+The plot compares the desired and simulated **X, Y, and Z positions** over time.
 
-The plot compares the desired and simulated X, Y, and Z positions over time.
+---
 
-Attitude and Rotor Speeds
+### Attitude and Rotor Speeds
 
+![Attitude and Motor Speeds](results/attitude_motors.png)
 
+This figure shows the simulated **roll, pitch, and yaw angles** together with the four rotor speeds.
 
-This figure shows the simulated roll, pitch, and yaw angles together with the four rotor speeds.
+---
 
-3D Flight Path
+### 3D Flight Path
 
-
+![3D Flight Path](results/flight_path_3d.png)
 
 The reference helical trajectory is compared with the simulated drone trajectory.
 
-Quadrotor Animation
+---
 
+### Quadrotor Animation
 
+![Quadrotor Animation](results/drone_animation.gif)
 
 The animation visualizes the quadrotor body, rotor locations, and flight trail along the simulated trajectory.
 
-Performance Metric
+---
+
+## 📈 Performance Metric
 
 The simulation calculates the position-tracking RMSE using:
 
+```text
 RMSE = sqrt(mean(||p_reference - p_actual||^2))
+```
 
 The value printed by the simulation should be treated as the result for the specific parameter configuration and simulation run.
 
-Customization
+---
 
-The project can be modified in several places:
+## 🔧 Customization
 
-Change the trajectory
+The project can be modified in several places.
+
+### Change the Trajectory
 
 Edit:
 
+```text
 functions/get_reference.m
+```
 
 The controller expects the reference generator to provide position, velocity, and yaw.
 
-Change drone parameters
+### Change Drone Parameters
 
 Edit:
 
+```text
 functions/quad_params.m
+```
 
-This includes mass, inertia, arm length, rotor coefficients, rotor limits, and controller gains.
+This includes:
 
-Change simulation duration or resolution
+* Mass
+* Inertia
+* Arm length
+* Rotor coefficients
+* Rotor limits
+* Controller gains
+
+### Change Simulation Duration or Resolution
 
 Edit the following values in:
 
+```text
 main_simulation.m
+```
 
+```matlab
 dt = 0.01;
 Tfinal = 30;
+```
 
-Limitations
+---
 
-This is a computational simulation rather than a complete physical flight model. The current implementation does not model effects such as:
+## ⚠️ Limitations
 
-Aerodynamic drag
+This is a computational simulation rather than a complete physical flight model.
 
-Blade flapping
+The current implementation does not model effects such as:
 
-Motor electrical dynamics
+* Aerodynamic drag
+* Blade flapping
+* Motor electrical dynamics
+* Battery voltage variation
+* Wind disturbances
+* Ground effect
+* Sensor noise
+* Actuator delays
+* Full aerodynamic rotor interactions
 
-Battery voltage variation
+The model is therefore intended primarily for studying **quadrotor dynamics, trajectory tracking, and basic flight-control concepts**.
 
-Wind disturbances
+---
 
-Ground effect
-
-Sensor noise
-
-Actuator delays
-
-Full aerodynamic rotor interactions
-
-The model is therefore intended primarily for studying quadrotor dynamics, trajectory tracking, and basic flight-control concepts.
-
-Future Improvements
+## 🚀 Future Improvements
 
 Possible extensions include:
 
-Adding wind and external disturbances
+* Adding wind and external disturbances
+* Adding sensor noise and state estimation
+* Implementing a Kalman or complementary filter
+* Modeling motor dynamics
+* Comparing PID with LQR or nonlinear control
+* Adding trajectory planning for different paths
+* Adding controller performance comparisons
+* Testing robustness under parameter uncertainty
 
-Adding sensor noise and state estimation
+---
 
-Implementing a Kalman or complementary filter
+## 👩‍💻 Author
 
-Modeling motor dynamics
+**RISHITHA C**
 
-Comparing PID with LQR or nonlinear control
-
-Adding trajectory planning for different paths
-
-Adding controller performance comparisons
-
-Testing robustness under parameter uncertainty
-
-Author
-
-RISHITHA C 
-
+Student Project — Computational Mechanics
