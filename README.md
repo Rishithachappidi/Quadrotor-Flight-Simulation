@@ -337,7 +337,7 @@ The value printed by the simulation should be treated as the result for the spec
 
 ---
 
-## 🔧 Customization
+## Customization
 
 The project can be modified in several places.
 
@@ -383,40 +383,7 @@ Tfinal = 30;
 
 ---
 
-##  Limitations
 
-This is a computational simulation rather than a complete physical flight model.
-
-The current implementation does not model effects such as:
-
-* Aerodynamic drag
-* Blade flapping
-* Motor electrical dynamics
-* Battery voltage variation
-* Wind disturbances
-* Ground effect
-* Sensor noise
-* Actuator delays
-* Full aerodynamic rotor interactions
-
-The model is therefore intended primarily for studying **quadrotor dynamics, trajectory tracking, and basic flight-control concepts**.
-
----
-
-##  Future Improvements
-
-Possible extensions include:
-
-* Adding wind and external disturbances
-* Adding sensor noise and state estimation
-* Implementing a Kalman or complementary filter
-* Modeling motor dynamics
-* Comparing PID with LQR or nonlinear control
-* Adding trajectory planning for different paths
-* Adding controller performance comparisons
-* Testing robustness under parameter uncertainty
-
----
 
 ##  Author
 
