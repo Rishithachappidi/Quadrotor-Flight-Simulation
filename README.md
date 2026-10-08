@@ -6,6 +6,9 @@ The simulation commands a **rising helical trajectory**, computes the required t
 
 ---
 
+
+
+
 ##  Overview
 
 This project models the main computational components of a quadrotor flight-control system:
